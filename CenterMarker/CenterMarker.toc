@@ -1,0 +1,8 @@
+## Interface: 110000, 120000
+## Title: Center Marker
+## Notes: Shows a simple plus marker at the center of your screen.
+## Author: Hubbs
+## Version: 0.2.6
+## SavedVariables: CenterMarkerDB
+
+CenterMarker.lua
