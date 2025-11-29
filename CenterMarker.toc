@@ -5,4 +5,9 @@
 ## Version: 0.2.6
 ## SavedVariables: CenterMarkerDB
 
-CenterMarker.lua
+CenterMarker_Init.lua
+CenterMarker_Marker.lua
+CenterMarker_CombatLog.lua
+CenterMarker_Config.lua
+CenterMarker_Commands.lua
+CenterMarker_Events.lua
