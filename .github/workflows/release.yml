@@ -5,6 +5,12 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
+env:
+  RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN != '' && secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
 jobs:
   release:
     # skip alpha tags (those are handled by the alpha workflow)
@@ -32,8 +38,9 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
-          files: |
+          artifacts: |
             dist/*.zip
             dist/*.sha256
+          token: ${{ env.RELEASE_TOKEN }}
           draft: false
           prerelease: false
