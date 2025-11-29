@@ -2,6 +2,10 @@
 set -euo pipefail
 echo "Running basic checks for CenterMarker addon"
 
+# Show a little diagnostic information to help CI troubleshooting
+echo "PWD: $(pwd)"
+echo "Listing top-level files:"; ls -1 || true
+
 # Check that the .toc file exists
 if [ ! -f "CenterMarker.toc" ]; then
   echo "Warning: CenterMarker.toc not found in repo root"
@@ -15,4 +19,4 @@ else
   echo "luacheck not installed — skipping Lua linting (install luacheck to enable)."
 fi
 
-echo "Basic checks complete." 
+echo "Basic checks complete."
