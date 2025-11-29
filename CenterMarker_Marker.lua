@@ -5,6 +5,9 @@ marker:SetFrameStrata("LOW")
 marker:SetFrameLevel(99)
 marker:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 
+-- Arial Narrow includes the bullet glyph; FRIZQT lacks it and would render a square.
+local bulletFont = "Fonts\\ARIALN.TTF"
+
 local plusText = marker:CreateFontString(nil, "OVERLAY", "GameFontHighlightHuge")
 plusText:SetPoint("CENTER")
 plusText:SetText("+")
@@ -16,10 +19,17 @@ addon.plusText = plusText
 local shapeChars = {
     plus = "+",
     x = "x",
-    dot = "\a",
-    bullet = "\a",
+    dot = "•",
+    bullet = "•",
     asterisk = "*",
 }
+
+local function fontForShape(shape)
+    if shape == "dot" or shape == "bullet" then
+        return bulletFont
+    end
+    return STANDARD_TEXT_FONT
+end
 
 local function updateAnchor(db)
     marker:ClearAllPoints()
@@ -52,7 +62,7 @@ function addon.applySettings()
 
     marker:SetSize(db.size, db.size)
     marker:SetAlpha(db.alpha)
-    plusText:SetFont(STANDARD_TEXT_FONT, db.size, "OUTLINE")
+    plusText:SetFont(fontForShape(db.shape), db.size, "OUTLINE")
     plusText:SetText(shapeChars[db.shape] or shapeChars.plus)
     plusText:SetTextColor(db.color.r, db.color.g, db.color.b, 1)
 

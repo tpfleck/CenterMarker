@@ -139,7 +139,7 @@ local function createConfigFrame()
     local shapeOptions = {
         { text = "Plus (+)", value = "plus" },
         { text = "X", value = "x" },
-        { text = "Dot (\a)", value = "dot" },
+        { text = "Dot (•)", value = "dot" },
         { text = "Asterisk (*)", value = "asterisk" },
     }
 
