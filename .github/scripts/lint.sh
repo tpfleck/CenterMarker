@@ -13,10 +13,17 @@ fi
 
 # If luacheck is installed, run it; otherwise show a message
 if command -v luacheck >/dev/null 2>&1; then
-  echo "Running luacheck..."
-  luacheck . || true
+  echo "Running luacheck with .luacheckrc..."
+  # Run luacheck and fail the script on any warnings/errors so CI blocks on issues
+  luacheck . --config .luacheckrc
+  rc=$?
+  if [ $rc -ne 0 ]; then
+    echo "luacheck found issues (exit code $rc). Failing CI."
+    exit $rc
+  fi
 else
-  echo "luacheck not installed — skipping Lua linting (install luacheck to enable)."
+  echo "Error: luacheck not installed — failing CI. Install luacheck to enable linting."
+  exit 1
 fi
 
 echo "Basic checks complete."
