@@ -30,6 +30,9 @@ jobs:
       - name: Create GitHub Release and upload assets
         uses: ncipollo/release-action@v1
         with:
+          # Use a personal access token stored in repository secrets to allow creating releases
+          # and uploading assets when the default GITHUB_TOKEN does not have sufficient permissions.
+          token: ${{ secrets.RELEASE_TOKEN }}
           tag: ${{ github.ref_name }}
           files: |
             dist/*.zip
