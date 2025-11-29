@@ -17,6 +17,11 @@ addon.defaults = {
     autoCombatLogAnnounce = true,
 }
 
+addon.limits = {
+    size = { min = 8, max = 256, step = 1 },
+    alpha = { min = 0, max = 1, step = 0.05 },
+}
+
 function addon.ensureDefaults(db, template)
     if type(db) ~= "table" then
         db = {}
@@ -77,6 +82,24 @@ function addon.clamp(value, minValue, maxValue)
         return maxValue
     end
     return value
+end
+
+function addon.normalizeDB(db)
+    db = addon.ensureDefaults(db, addon.defaults)
+    addon.ensureColor(db)
+    addon.ensureOffset(db)
+    addon.ensureCondition(db)
+    addon.ensureShape(db)
+    addon.ensureCombatLogSettings(db)
+    return db
+end
+
+function addon.isPlayerInCombat()
+    if InCombatLockdown and InCombatLockdown() then
+        return true
+    end
+    local inCombat = UnitAffectingCombat and UnitAffectingCombat("player")
+    return inCombat and true or false
 end
 
 function addon.getAddonVersion()

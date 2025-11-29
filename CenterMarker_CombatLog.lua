@@ -3,6 +3,11 @@ local addon = CenterMarker
 local combatLog = {}
 addon.combatLog = combatLog
 
+local function ensureDB()
+    CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
+    return CenterMarkerDB
+end
+
 local difficultyRules = {
     { enabled = false, label = "Always on", match = function() return true end },
     {
@@ -79,7 +84,8 @@ local function shouldLog(eventName, info)
 end
 
 local function announce(enabled, reason)
-    if not CenterMarkerDB or not CenterMarkerDB.autoCombatLogAnnounce then
+    local db = ensureDB()
+    if not db.autoCombatLogAnnounce then
         return
     end
     local frame = DEFAULT_CHAT_FRAME or ChatFrame1
@@ -101,14 +107,10 @@ local function setLogging(enabled, reason)
 end
 
 function combatLog.evaluate(eventName)
-    if not CenterMarkerDB then
-        return
-    end
-
-    addon.ensureCombatLogSettings(CenterMarkerDB)
+    local db = ensureDB()
     combatLog.active = LoggingCombat() and true or false
 
-    if not CenterMarkerDB.autoCombatLogEnabled then
+    if not db.autoCombatLogEnabled then
         if combatLog.active then
             setLogging(false, "disabled")
         end
@@ -126,6 +128,7 @@ function combatLog.evaluate(eventName)
 end
 
 function combatLog.bootstrap()
+    ensureDB()
     combatLog.active = LoggingCombat() and true or false
     combatLog.evaluate("PLAYER_ENTERING_WORLD")
 end

@@ -1,41 +1,59 @@
 local addon = CenterMarker
 
 local events = CreateFrame("Frame")
-events:RegisterEvent("ADDON_LOADED")
-events:RegisterEvent("PLAYER_ENTERING_WORLD")
-events:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-events:RegisterEvent("PLAYER_DIFFICULTY_CHANGED")
-events:RegisterEvent("CHALLENGE_MODE_START")
-events:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-events:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
-events:RegisterEvent("PLAYER_TARGET_CHANGED")
-events:RegisterEvent("PLAYER_REGEN_DISABLED")
-events:RegisterEvent("PLAYER_REGEN_ENABLED")
-events:RegisterEvent("PLAYER_ENTER_COMBAT")
-events:RegisterEvent("PLAYER_LEAVE_COMBAT")
 
-events:SetScript("OnEvent", function(_, event, arg1)
-    if event == "ADDON_LOADED" and arg1 == addon.name then
-        CenterMarkerDB = addon.ensureDefaults(CenterMarkerDB, addon.defaults)
-        addon.ensureCombatLogSettings(CenterMarkerDB)
+local function reevaluateCombatLog(event)
+    if addon.combatLog then
+        addon.combatLog.evaluate(event)
+    end
+end
+
+local function refreshSettings()
+    addon.applySettings()
+end
+
+local eventHandlers = {
+    ADDON_LOADED = function(_, arg1)
+        if arg1 ~= addon.name then
+            return
+        end
+        CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
         addon.applySettings()
         if addon.combatLog then
             addon.combatLog.bootstrap()
         end
-    elseif event == "PLAYER_ENTERING_WORLD" then
+    end,
+    PLAYER_ENTERING_WORLD = function(event)
         addon.applySettings()
-        if addon.combatLog then
-            addon.combatLog.evaluate(event)
+        reevaluateCombatLog(event)
+    end,
+    ZONE_CHANGED_NEW_AREA = reevaluateCombatLog,
+    PLAYER_DIFFICULTY_CHANGED = reevaluateCombatLog,
+    CHALLENGE_MODE_START = reevaluateCombatLog,
+    NAME_PLATE_UNIT_ADDED = function(_, unit)
+        if unit == "player" then
+            addon.updateAnchor()
         end
-    elseif event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "CHALLENGE_MODE_START" then
-        if addon.combatLog then
-            addon.combatLog.evaluate(event)
+    end,
+    NAME_PLATE_UNIT_REMOVED = function(_, unit)
+        if unit == "player" then
+            addon.updateAnchor()
         end
-    elseif (event == "NAME_PLATE_UNIT_ADDED" or event == "NAME_PLATE_UNIT_REMOVED") and arg1 == "player" then
-        addon.updateAnchor()
-    elseif event == "PLAYER_TARGET_CHANGED" then
-        addon.updateAnchor()
-    elseif event == "PLAYER_REGEN_DISABLED" or event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_ENTER_COMBAT" or event == "PLAYER_LEAVE_COMBAT" then
-        addon.applySettings()
+    end,
+    PLAYER_TARGET_CHANGED = addon.updateAnchor,
+    PLAYER_REGEN_DISABLED = refreshSettings,
+    PLAYER_REGEN_ENABLED = refreshSettings,
+    PLAYER_ENTER_COMBAT = refreshSettings,
+    PLAYER_LEAVE_COMBAT = refreshSettings,
+}
+
+for event in pairs(eventHandlers) do
+    events:RegisterEvent(event)
+end
+
+events:SetScript("OnEvent", function(_, event, arg1)
+    local handler = eventHandlers[event]
+    if handler then
+        handler(event, arg1)
     end
 end)

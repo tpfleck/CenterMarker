@@ -1,15 +1,26 @@
 local addon = CenterMarker
 local defaults = addon.defaults
+local sizeLimits = addon.limits.size
+local alphaLimits = addon.limits.alpha
 
 local configFrame
 
+local function initDropdown(dropdown, options, onSelect)
+    UIDropDownMenu_SetWidth(dropdown, 170)
+    UIDropDownMenu_Initialize(dropdown, function(_, level)
+        local info = UIDropDownMenu_CreateInfo()
+        info.func = function(btn)
+            onSelect(btn.value)
+        end
+        for _, option in ipairs(options) do
+            info.text, info.value = option.text, option.value
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end)
+end
+
 local function createConfigFrame()
-    CenterMarkerDB = addon.ensureDefaults(CenterMarkerDB, defaults)
-    addon.ensureColor(CenterMarkerDB)
-    addon.ensureOffset(CenterMarkerDB)
-    addon.ensureCondition(CenterMarkerDB)
-    addon.ensureShape(CenterMarkerDB)
-    addon.ensureCombatLogSettings(CenterMarkerDB)
+    CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
 
     local frame = CreateFrame("Frame", "CenterMarkerConfigFrame", UIParent, "BackdropTemplate")
     frame:SetSize(400, 300)
@@ -125,7 +136,12 @@ local function createConfigFrame()
 
     local shapeDropdown = CreateFrame("Frame", "CenterMarkerShapeDropdown", frame, "UIDropDownMenuTemplate")
     shapeDropdown:SetPoint("LEFT", shapeLabel, "LEFT", dropdownOffset, -2)
-    UIDropDownMenu_SetWidth(shapeDropdown, 170)
+    local shapeOptions = {
+        { text = "Plus (+)", value = "plus" },
+        { text = "X", value = "x" },
+        { text = "Dot (\a)", value = "dot" },
+        { text = "Asterisk (*)", value = "asterisk" },
+    }
 
     local function setShape(value)
         CenterMarkerDB.shape = value
@@ -133,24 +149,7 @@ local function createConfigFrame()
         addon.applySettings()
     end
 
-    UIDropDownMenu_Initialize(shapeDropdown, function(_, level)
-        local info = UIDropDownMenu_CreateInfo()
-        info.func = function(btn)
-            setShape(btn.value)
-        end
-
-        info.text, info.value = "Plus (+)", "plus"
-        UIDropDownMenu_AddButton(info, level)
-
-        info.text, info.value = "X", "x"
-        UIDropDownMenu_AddButton(info, level)
-
-        info.text, info.value = "Dot (•)", "dot"
-        UIDropDownMenu_AddButton(info, level)
-
-        info.text, info.value = "Asterisk (*)", "asterisk"
-        UIDropDownMenu_AddButton(info, level)
-    end)
+    initDropdown(shapeDropdown, shapeOptions, setShape)
 
     local conditionLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     conditionLabel:SetPoint("TOPLEFT", shapeLabel, "BOTTOMLEFT", 0, -24)
@@ -158,7 +157,11 @@ local function createConfigFrame()
 
     local conditionDropdown = CreateFrame("Frame", "CenterMarkerConditionDropdown", frame, "UIDropDownMenuTemplate")
     conditionDropdown:SetPoint("LEFT", conditionLabel, "LEFT", dropdownOffset, -2)
-    UIDropDownMenu_SetWidth(conditionDropdown, 170)
+    local conditionOptions = {
+        { text = "Always", value = "always" },
+        { text = "When in Combat", value = "combat" },
+        { text = "When not in Combat", value = "nocombat" },
+    }
 
     local function setCondition(value)
         CenterMarkerDB.showCondition = value
@@ -166,35 +169,21 @@ local function createConfigFrame()
         addon.applySettings()
     end
 
-    UIDropDownMenu_Initialize(conditionDropdown, function(_, level)
-        local info = UIDropDownMenu_CreateInfo()
-        info.func = function(btn)
-            setCondition(btn.value)
-        end
-
-        info.text, info.value = "Always", "always"
-        UIDropDownMenu_AddButton(info, level)
-
-        info.text, info.value = "When in Combat", "combat"
-        UIDropDownMenu_AddButton(info, level)
-
-        info.text, info.value = "When not in Combat", "nocombat"
-        UIDropDownMenu_AddButton(info, level)
-    end)
+    initDropdown(conditionDropdown, conditionOptions, setCondition)
 
     local sizeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     sizeLabel:SetPoint("TOPLEFT", conditionLabel, "BOTTOMLEFT", 0, -24)
-    sizeLabel:SetText("Size (8-256):")
+    sizeLabel:SetText(string.format("Size (%d-%d):", sizeLimits.min, sizeLimits.max))
 
     local slider = CreateFrame("Slider", "CenterMarkerSizeSlider", frame, "OptionsSliderTemplate")
     slider:SetWidth(200)
     slider:SetPoint("TOPLEFT", sizeLabel, "BOTTOMLEFT", 0, -16)
-    slider:SetMinMaxValues(8, 256)
-    slider:SetValueStep(1)
+    slider:SetMinMaxValues(sizeLimits.min, sizeLimits.max)
+    slider:SetValueStep(sizeLimits.step)
     slider:SetObeyStepOnDrag(true)
 
-    _G[slider:GetName() .. "Low"]:SetText("8")
-    _G[slider:GetName() .. "High"]:SetText("256")
+    _G[slider:GetName() .. "Low"]:SetText(tostring(sizeLimits.min))
+    _G[slider:GetName() .. "High"]:SetText(tostring(sizeLimits.max))
     _G[slider:GetName() .. "Text"]:SetText("Marker Size")
 
     local track = slider:CreateTexture(nil, "BACKGROUND")
@@ -218,17 +207,17 @@ local function createConfigFrame()
 
     local alphaLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     alphaLabel:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 0, -24)
-    alphaLabel:SetText("Alpha (0-1):")
+    alphaLabel:SetText(string.format("Alpha (%.0f-%.0f):", alphaLimits.min, alphaLimits.max))
 
     local alphaSlider = CreateFrame("Slider", "CenterMarkerAlphaSlider", frame, "OptionsSliderTemplate")
     alphaSlider:SetWidth(200)
     alphaSlider:SetPoint("TOPLEFT", alphaLabel, "BOTTOMLEFT", 0, -16)
-    alphaSlider:SetMinMaxValues(0, 1)
-    alphaSlider:SetValueStep(0.05)
+    alphaSlider:SetMinMaxValues(alphaLimits.min, alphaLimits.max)
+    alphaSlider:SetValueStep(alphaLimits.step)
     alphaSlider:SetObeyStepOnDrag(true)
 
-    _G[alphaSlider:GetName() .. "Low"]:SetText("0")
-    _G[alphaSlider:GetName() .. "High"]:SetText("1")
+    _G[alphaSlider:GetName() .. "Low"]:SetText(tostring(alphaLimits.min))
+    _G[alphaSlider:GetName() .. "High"]:SetText(tostring(alphaLimits.max))
     _G[alphaSlider:GetName() .. "Text"]:SetText("Opacity")
 
     local alphaTrack = alphaSlider:CreateTexture(nil, "BACKGROUND")
@@ -306,7 +295,7 @@ local function createConfigFrame()
     unrelatedControls = { unrelatedHeader, autoLogToggle, autoLogText }
 
     slider:SetScript("OnValueChanged", function(_, value)
-        CenterMarkerDB.size = addon.clamp(math.floor(value + 0.5), 8, 256)
+        CenterMarkerDB.size = addon.clamp(math.floor(value + 0.5), sizeLimits.min, sizeLimits.max)
         addon.applySettings()
         editBox:SetNumber(CenterMarkerDB.size)
     end)
@@ -314,7 +303,7 @@ local function createConfigFrame()
     local function applyBoxValue()
         local value = tonumber(editBox:GetText())
         if value then
-            CenterMarkerDB.size = addon.clamp(math.floor(value + 0.5), 8, 256)
+            CenterMarkerDB.size = addon.clamp(math.floor(value + 0.5), sizeLimits.min, sizeLimits.max)
             slider:SetValue(CenterMarkerDB.size)
             addon.applySettings()
         else
@@ -331,7 +320,7 @@ local function createConfigFrame()
     end)
 
     alphaSlider:SetScript("OnValueChanged", function(_, value)
-        CenterMarkerDB.alpha = addon.clamp(value, 0, 1)
+        CenterMarkerDB.alpha = addon.clamp(value, alphaLimits.min, alphaLimits.max)
         addon.applySettings()
         alphaEdit:SetText(string.format("%.2f", CenterMarkerDB.alpha))
     end)
@@ -339,7 +328,7 @@ local function createConfigFrame()
     local function applyAlphaBox()
         local value = tonumber(alphaEdit:GetText())
         if value then
-            CenterMarkerDB.alpha = addon.clamp(value, 0, 1)
+            CenterMarkerDB.alpha = addon.clamp(value, alphaLimits.min, alphaLimits.max)
             alphaSlider:SetValue(CenterMarkerDB.alpha)
             addon.applySettings()
         else
