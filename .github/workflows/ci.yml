@@ -16,7 +16,7 @@ jobs:
       - name: Set up Lua and luacheck
         run: |
           sudo apt-get update
-          sudo apt-get install -y lua5.3 luarocks rsync zip unzip gawk
+          sudo apt-get install -y lua5.3 luarocks liblua5.3-dev build-essential rsync zip unzip gawk
           # Try installing luacheck via luarocks; if it fails, show a warning but keep job going
           if ! sudo luarocks install luacheck; then
             echo "Warning: luarocks failed to install luacheck. Lint step may be skipped.";
