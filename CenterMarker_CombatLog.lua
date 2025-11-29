@@ -49,13 +49,15 @@ local difficultyRules = {
         enabled = false,
         label = "Legacy Raid",
         match = function(info)
-            return info.instanceType == "raid" and (info.difficultyID == 3 or info.difficultyID == 4 or info.difficultyID == 5 or info.difficultyID == 6 or info.difficultyID == 7 or info.difficultyID == 9)
+            local d = info.difficultyID
+            local legacy = d == 3 or d == 4 or d == 5 or d == 6 or d == 7 or d == 9
+            return info.instanceType == "raid" and legacy
         end,
     },
 }
 
 local function readInstanceInfo()
-    local name, instanceType, difficultyID, difficultyName, maxPlayers, playerDifficulty, isDynamicInstance, mapID, instanceGroupSize = GetInstanceInfo()
+    local name, instanceType, difficultyID, difficultyName, maxPlayers, _, _, mapID, instanceGroupSize = GetInstanceInfo()
     return {
         name = name or "",
         instanceType = instanceType,
