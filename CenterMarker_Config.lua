@@ -360,7 +360,7 @@ local function createConfigFrame()
         end
 
         local function restoreColor()
-            local r, g, b = unpack(prev)
+            local r, g, b = table.unpack(prev)
             addon.setColor(r, g, b)
             swatchTexture:SetColorTexture(r, g, b, 1)
         end
