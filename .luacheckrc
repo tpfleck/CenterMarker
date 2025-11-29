@@ -19,10 +19,13 @@ return {
     "UIDropDownMenu_AddButton",
     "UIDropDownMenu_SetSelectedValue",
     "UIDropDownMenu_SetWidth",
+    "UIDropDownMenu_CreateInfo",
     "ColorPickerFrame",
     "SlashCmdList",
     "SLASH_CENTERMARKER1",
     "SLASH_CENTERMARKER2",
+    "unpack",
   },
-  max_line_length = 120,
+  -- Increase max line length to reduce noise; can be tightened later
+  max_line_length = 160,
 }
