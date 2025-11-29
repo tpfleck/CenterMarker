@@ -7,9 +7,9 @@ addon.name = addonName
 
 addon.defaults = {
     enabled = true,
-    size = 12,
+    size = 32,
     alpha = 1,
-    placeOffset = -20,
+    placeOffset = -10,
     showCondition = "always",
     shape = "plus",
     color = { r = 1, g = 0.82, b = 0 },
