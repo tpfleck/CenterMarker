@@ -1,0 +1,26 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Archives
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+
+# Visual Studio
+*.suo
+*.user
+
+# Ignore node modules if ever added
+node_modules/
