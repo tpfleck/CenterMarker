@@ -22,14 +22,13 @@ jobs:
 
       - name: Create release ZIP
         run: |
+          # Build a clean package directory with only addon files
+          rm -rf package dist
           mkdir -p dist package/CenterMarker
-          # Copy repository files into package/CenterMarker while excluding .git, .github, dist and existing zips
-          find . -maxdepth 1 -mindepth 1 \
-            -not -name '.git' -not -name '.github' -not -name 'dist' -not -name '*.zip' \
-            -exec cp -r '{}' package/CenterMarker/ \;
-          pushd package
-          zip -r "../dist/CenterMarker-${{ github.ref_name }}.zip" CenterMarker
-          popd
+          cp CenterMarker*.lua CenterMarker.toc README.md package/CenterMarker/
+          (cd package && zip -r "../dist/CenterMarker-${{ github.ref_name }}.zip" CenterMarker)
+          echo "Package contents:"
+          ls -l package/CenterMarker
       - name: Create SHA256 checksum for ZIP
         run: |
           sha256sum "dist/CenterMarker-${{ github.ref_name }}.zip" | awk '{print $1}' > "dist/CenterMarker-${{ github.ref_name }}.zip.sha256"
