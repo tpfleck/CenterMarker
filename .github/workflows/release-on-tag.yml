@@ -18,10 +18,16 @@ jobs:
           # Ensure the ZIP contains a top-level CenterMarker/ folder
           zip -r "dist/CenterMarker-${{ github.ref_name }}.zip" CenterMarker
 
-      - name: Create GitHub Release and upload asset
+      - name: Create SHA256 checksum for ZIP
+        run: |
+          sha256sum "dist/CenterMarker-${{ github.ref_name }}.zip" | awk '{print $1}' > "dist/CenterMarker-${{ github.ref_name }}.zip.sha256"
+
+      - name: Create GitHub Release and upload assets
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
-          files: dist/*.zip
+          files: |
+            dist/*.zip
+            dist/*.sha256
           draft: false
           prerelease: true
