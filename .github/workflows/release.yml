@@ -16,9 +16,12 @@ jobs:
 
       - name: Create release ZIP
         run: |
-          mkdir -p dist
-          # Ensure ZIP root contains a top-level CenterMarker/ folder
-          zip -r "dist/CenterMarker-${{ github.ref_name }}.zip" CenterMarker
+          mkdir -p dist package/CenterMarker
+          # Copy repository files into a package/CenterMarker folder so the zip root contains CenterMarker/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='dist' --exclude='*.zip' ./ package/CenterMarker/
+          pushd package
+          zip -r "../dist/CenterMarker-${{ github.ref_name }}.zip" CenterMarker
+          popd
       - name: Create SHA256 checksum for ZIP
         run: |
           sha256sum "dist/CenterMarker-${{ github.ref_name }}.zip" | awk '{print $1}' > "dist/CenterMarker-${{ github.ref_name }}.zip.sha256"
