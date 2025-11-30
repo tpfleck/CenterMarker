@@ -43,6 +43,10 @@ local function shouldShowByCondition(db)
         return addon.isPlayerInCombat()
     elseif cond == "nocombat" then
         return not addon.isPlayerInCombat()
+    elseif cond == "instance" then
+        return addon.isPlayerInInstance()
+    elseif cond == "noinstance" then
+        return not addon.isPlayerInInstance()
     end
     return true
 end

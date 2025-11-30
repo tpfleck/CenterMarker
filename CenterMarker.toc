@@ -2,7 +2,7 @@
 ## Title: Center Marker
 ## Notes: Shows a simple plus marker at the center of your screen.
 ## Author: Hubbs
-## Version: 0.5.2
+## Version: 0.6.0
 ## SavedVariables: CenterMarkerDB
 
 CenterMarker_Init.lua

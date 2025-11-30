@@ -23,7 +23,7 @@ local function createConfigFrame()
     CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
 
     local frame = CreateFrame("Frame", "CenterMarkerConfigFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(400, 300)
+    frame:SetSize(440, 300)
     frame:SetPoint("CENTER")
     frame:SetMovable(true)
     frame:EnableMouse(true)
@@ -159,8 +159,10 @@ local function createConfigFrame()
     conditionDropdown:SetPoint("LEFT", conditionLabel, "LEFT", dropdownOffset, -2)
     local conditionOptions = {
         { text = "Always", value = "always" },
-        { text = "When in Combat", value = "combat" },
-        { text = "When not in Combat", value = "nocombat" },
+        { text = "In Combat", value = "combat" },
+        { text = "Not in Combat", value = "nocombat" },
+        { text = "In Instance", value = "instance" },
+        { text = "Not in Instance", value = "noinstance" },
     }
 
     local function setCondition(value)
@@ -170,6 +172,25 @@ local function createConfigFrame()
     end
 
     initDropdown(conditionDropdown, conditionOptions, setCondition)
+
+    local conditionInfo = CreateFrame("Button", nil, frame)
+    conditionInfo:SetSize(18, 18)
+    conditionInfo:SetPoint("LEFT", conditionDropdown, "RIGHT", 8, 0)
+    conditionInfo:SetNormalTexture("Interface\\FriendsFrame\\InformationIcon")
+    conditionInfo:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+    conditionInfo:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Instance types", 1, 1, 1)
+        GameTooltip:AddLine("\"party\" - 5-man dungeon (including follower dungeons)", nil, nil, nil, true)
+        GameTooltip:AddLine("\"raid\" - raid", nil, nil, nil, true)
+        GameTooltip:AddLine("\"scenario\" - scenario", nil, nil, nil, true)
+        GameTooltip:AddLine("\"pvp\" - battleground", nil, nil, nil, true)
+        GameTooltip:AddLine("\"arena\" - arena", nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    conditionInfo:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
 
     local sizeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     sizeLabel:SetPoint("TOPLEFT", conditionLabel, "BOTTOMLEFT", 0, -24)
@@ -260,6 +281,7 @@ local function createConfigFrame()
         shapeDropdown,
         conditionLabel,
         conditionDropdown,
+        conditionInfo,
         sizeLabel,
         slider,
         _G[slider:GetName() .. "Low"],

@@ -3,7 +3,7 @@
 ### Feature Overview
 - **Always-visible anchor**: Places a crisp “+” at screen center; adjust size (8–256 px) and opacity (0–1).
 - **Color control**: Pick any color via swatch; changes apply instantly and persist.
-- **Visibility modes**: Show always, only in combat, or only out of combat.
+- **Visibility modes**: Show always, only in combat, only out of combat, only in instances, or only outside instances.
 - **Marker style choice**: Select +, x, dot (•), or asterisk (*).
 - **Vertical offset**: Shift the marker up/down from center with a numeric Y-offset (supports negatives).
 - **Quick toggle**: Enable/disable the marker without reloading UI.
@@ -20,7 +20,7 @@
 - Set alpha via slider or number box.
 - Pick a color from the swatch.
 - Choose marker style (plus, x, dot •, asterisk *).
-- Choose when to show the marker: Always, In Combat, or Not in Combat.
+- Choose when to show the marker: Always, In Combat, Not in Combat, In Instance, or Not in Instance.
 - Adjust feet Y-offset to nudge the marker vertically from center.
 - Enable auto combat logging from the **Cool Stuff** tab if you want `/combatlog` handled automatically in group content.
 

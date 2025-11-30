@@ -24,12 +24,21 @@ local eventHandlers = {
         end
     end,
     PLAYER_ENTERING_WORLD = function(event)
-        addon.applySettings()
+        refreshSettings()
         reevaluateCombatLog(event)
     end,
-    ZONE_CHANGED_NEW_AREA = reevaluateCombatLog,
-    PLAYER_DIFFICULTY_CHANGED = reevaluateCombatLog,
-    CHALLENGE_MODE_START = reevaluateCombatLog,
+    ZONE_CHANGED_NEW_AREA = function(event)
+        refreshSettings()
+        reevaluateCombatLog(event)
+    end,
+    PLAYER_DIFFICULTY_CHANGED = function(event)
+        refreshSettings()
+        reevaluateCombatLog(event)
+    end,
+    CHALLENGE_MODE_START = function(event)
+        refreshSettings()
+        reevaluateCombatLog(event)
+    end,
     NAME_PLATE_UNIT_ADDED = function(_, unit)
         if unit == "player" then
             addon.updateAnchor()

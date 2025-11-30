@@ -53,7 +53,13 @@ function addon.ensureOffset(db)
 end
 
 function addon.ensureCondition(db)
-    local valid = { always = true, combat = true, nocombat = true }
+    if db.showCondition == "encounter" then
+        db.showCondition = "instance"
+    elseif db.showCondition == "noencounter" then
+        db.showCondition = "noinstance"
+    end
+
+    local valid = { always = true, combat = true, nocombat = true, instance = true, noinstance = true }
     if not valid[db.showCondition] then
         db.showCondition = addon.defaults.showCondition
     end
@@ -94,12 +100,28 @@ function addon.normalizeDB(db)
     return db
 end
 
+local instanceTypes = {
+    party = true, -- 5-man dungeon (including follower dungeons)
+    raid = true,
+    scenario = true,
+    pvp = true,
+    arena = true,
+}
+
 function addon.isPlayerInCombat()
     if InCombatLockdown and InCombatLockdown() then
         return true
     end
     local inCombat = UnitAffectingCombat and UnitAffectingCombat("player")
     return inCombat and true or false
+end
+
+function addon.isPlayerInInstance()
+    local inInstance, instanceType = IsInInstance()
+    if not inInstance then
+        return false
+    end
+    return instanceTypes[instanceType] and true or false
 end
 
 function addon.getAddonVersion()
