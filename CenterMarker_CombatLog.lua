@@ -8,13 +8,33 @@ local function ensureDB()
     return CenterMarkerDB
 end
 
+local function isChallengeModeActive()
+    if not C_ChallengeMode then
+        return false
+    end
+
+    if C_ChallengeMode.IsChallengeModeActive and C_ChallengeMode.IsChallengeModeActive() then
+        return true
+    end
+
+    if C_ChallengeMode.GetActiveChallengeMapID then
+        local mapID = C_ChallengeMode.GetActiveChallengeMapID()
+        return mapID and mapID > 0
+    end
+
+    return false
+end
+
 local difficultyRules = {
     { enabled = false, label = "Always on", match = function() return true end },
     {
         enabled = true,
         label = "Mythic+ Dungeon",
         match = function(info, eventName)
-            return eventName == "CHALLENGE_MODE_START" or (info.instanceType == "party" and info.difficultyID == 8)
+            if eventName == "CHALLENGE_MODE_START" or isChallengeModeActive() then
+                return true
+            end
+            return info.instanceType == "party" and info.difficultyID == 8
         end,
     },
     { enabled = true, label = "Mythic Raid", match = function(info) return info.instanceType == "raid" and info.difficultyID == 16 end },

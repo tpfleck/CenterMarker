@@ -24,3 +24,6 @@ __pycache__/
 
 # Ignore node modules if ever added
 node_modules/
+
+# Packaging output
+package/
