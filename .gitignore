@@ -10,9 +10,15 @@ Thumbs.db
 *.log
 *.tmp
 *.bak
+*.old
+*.orig
 
 # Archives
 *.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
 
 # Python
 __pycache__/
@@ -27,3 +33,8 @@ node_modules/
 
 # Packaging output
 package/
+dist/
+CenterMarker/
+
+# Local docs
+RELEASE.md
