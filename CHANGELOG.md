@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.2
+- Added `/cm cdm` slash command to open the Cooldown Manager settings window.
+- Added `/cm kb` slash command to open the quick keybind menu (falls back to the classic binding frame if needed).
+- Add a short hold after keystone start so auto combat logging stays on without spamming during the Mythic+ countdown.
+
 ## 0.6.1
 - Fix combat log chat spam during Mythic+ countdown (keeps logging steady through keystone start).
 - Marked compatibility for Retail 11.2.7.

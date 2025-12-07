@@ -3,6 +3,8 @@ local addon = CenterMarker
 local combatLog = {}
 addon.combatLog = combatLog
 
+local challengeStartHoldSeconds = 15 -- grace window to avoid toggling during keystone countdown
+
 local function ensureDB()
     CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
     return CenterMarkerDB
@@ -23,6 +25,30 @@ local function isChallengeModeActive()
     end
 
     return false
+end
+
+local function markChallengeStart(info)
+    combatLog.lastChallengeStart = GetTime and GetTime() or nil
+    if info and info.mapID and info.mapID > 0 then
+        combatLog.lastChallengeMapID = info.mapID
+    end
+end
+
+local function isInChallengeHold(info)
+    if not combatLog.lastChallengeStart then
+        return false
+    end
+    if not info or info.instanceType ~= "party" then
+        return false
+    end
+    local now = GetTime and GetTime()
+    if not now or (now - combatLog.lastChallengeStart) > challengeStartHoldSeconds then
+        return false
+    end
+    if combatLog.lastChallengeMapID and combatLog.lastChallengeMapID > 0 then
+        return info.mapID == combatLog.lastChallengeMapID
+    end
+    return true
 end
 
 local difficultyRules = {
@@ -138,12 +164,22 @@ function combatLog.evaluate(eventName)
     end
 
     local info = readInstanceInfo()
+    if eventName == "CHALLENGE_MODE_START" then
+        markChallengeStart(info)
+    end
     local logThis, reason = shouldLog(eventName, info)
+
+    if not logThis and isInChallengeHold(info) then
+        logThis = true
+        reason = reason or "Mythic+ start"
+    end
 
     if logThis then
         setLogging(true, reason or info.difficultyName or info.name)
     else
         setLogging(false, "left instance")
+        combatLog.lastChallengeStart = nil
+        combatLog.lastChallengeMapID = nil
     end
 end
 

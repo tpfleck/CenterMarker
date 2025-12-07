@@ -7,6 +7,8 @@ local function printHelp()
     print("/cm           - Open config panel")
     print(string.format("/cm size <%d-%d> - Set size", limits.size.min, limits.size.max))
     print(string.format("/cm alpha <%.1f-%.1f> - Set opacity", limits.alpha.min, limits.alpha.max))
+    print("/cm kb        - Open keybind menu")
+    print("/cm cdm       - Open Cooldown Manager settings")
     print("/cm toggle    - Show or hide the marker")
     print("/cm help      - Show these commands")
 end
@@ -41,10 +43,48 @@ local function setAlpha(rest)
     print("CenterMarker opacity set to " .. CenterMarkerDB.alpha)
 end
 
+local function openKeybindMenu()
+    if InCombatLockdown and InCombatLockdown() then
+        print("CenterMarker: cannot open keybinds in combat.")
+        return
+    end
+
+    if not QuickKeybindFrame and QuickKeybindFrame_LoadUI then
+        QuickKeybindFrame_LoadUI()
+    end
+
+    if QuickKeybindFrame then
+        ShowUIPanel(QuickKeybindFrame)
+        return
+    end
+
+    if not KeyBindingFrame and KeyBindingFrame_LoadUI then
+        KeyBindingFrame_LoadUI()
+    end
+
+    if KeyBindingFrame then
+        ShowUIPanel(KeyBindingFrame)
+        return
+    end
+
+    print("CenterMarker: unable to open the keybind menu.")
+end
+
+local function openCooldownManagerSettings()
+    if CooldownViewerSettings and CooldownViewerSettings.Show then
+        CooldownViewerSettings:Show()
+        return
+    end
+
+    print("CenterMarker: Cooldown Manager settings are unavailable.")
+end
+
 local handlers = {
     toggle = toggleEnabled,
     size = setSize,
     alpha = setAlpha,
+    kb = openKeybindMenu,
+    cdm = openCooldownManagerSettings,
     help = printHelp,
     ["?"] = printHelp,
 }
