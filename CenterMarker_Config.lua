@@ -19,6 +19,34 @@ local function initDropdown(dropdown, options, onSelect)
     end)
 end
 
+local function setDropdownSelection(dropdown, options, value, defaultValue)
+    local selectedText
+
+    for _, option in ipairs(options) do
+        if option.value == value then
+            selectedText = option.text
+            break
+        end
+    end
+
+    if not selectedText and defaultValue then
+        value = defaultValue
+        for _, option in ipairs(options) do
+            if option.value == value then
+                selectedText = option.text
+                break
+            end
+        end
+    end
+
+    UIDropDownMenu_SetSelectedValue(dropdown, value)
+    if selectedText then
+        UIDropDownMenu_SetText(dropdown, selectedText)
+    end
+
+    return value
+end
+
 local function createConfigFrame()
     CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
 
@@ -144,8 +172,7 @@ local function createConfigFrame()
     }
 
     local function setShape(value)
-        CenterMarkerDB.shape = value
-        UIDropDownMenu_SetSelectedValue(shapeDropdown, value)
+        CenterMarkerDB.shape = setDropdownSelection(shapeDropdown, shapeOptions, value, defaults.shape)
         addon.applySettings()
     end
 
@@ -166,8 +193,7 @@ local function createConfigFrame()
     }
 
     local function setCondition(value)
-        CenterMarkerDB.showCondition = value
-        UIDropDownMenu_SetSelectedValue(conditionDropdown, value)
+        CenterMarkerDB.showCondition = setDropdownSelection(conditionDropdown, conditionOptions, value, defaults.showCondition)
         addon.applySettings()
     end
 
@@ -433,8 +459,13 @@ local function createConfigFrame()
         alphaEdit:SetText(string.format("%.2f", CenterMarkerDB.alpha))
         swatchTexture:SetColorTexture(CenterMarkerDB.color.r, CenterMarkerDB.color.g, CenterMarkerDB.color.b, 1)
         enableCheck:SetChecked(CenterMarkerDB.enabled)
-        UIDropDownMenu_SetSelectedValue(shapeDropdown, CenterMarkerDB.shape)
-        UIDropDownMenu_SetSelectedValue(conditionDropdown, CenterMarkerDB.showCondition)
+        local newShape = setDropdownSelection(shapeDropdown, shapeOptions, CenterMarkerDB.shape, defaults.shape)
+        local newCondition = setDropdownSelection(conditionDropdown, conditionOptions, CenterMarkerDB.showCondition, defaults.showCondition)
+        if CenterMarkerDB.shape ~= newShape or CenterMarkerDB.showCondition ~= newCondition then
+            CenterMarkerDB.shape = newShape
+            CenterMarkerDB.showCondition = newCondition
+            addon.applySettings()
+        end
         feetOffsetBox:SetText(tostring(CenterMarkerDB.placeOffset or defaults.placeOffset))
         autoLogToggle:SetChecked(CenterMarkerDB.autoCombatLogEnabled)
         resizeToContent()

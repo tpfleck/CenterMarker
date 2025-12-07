@@ -4,6 +4,7 @@ local combatLog = {}
 addon.combatLog = combatLog
 
 local challengeStartHoldSeconds = 15 -- grace window to avoid toggling during keystone countdown
+local enableHoldSeconds = 20 -- avoid flip-flopping off immediately after we just enabled
 
 local function ensureDB()
     CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
@@ -27,8 +28,15 @@ local function isChallengeModeActive()
     return false
 end
 
+local function now()
+    if GetTime then
+        return GetTime()
+    end
+    return 0
+end
+
 local function markChallengeStart(info)
-    combatLog.lastChallengeStart = GetTime and GetTime() or nil
+    combatLog.lastChallengeStart = now()
     if info and info.mapID and info.mapID > 0 then
         combatLog.lastChallengeMapID = info.mapID
     end
@@ -149,6 +157,9 @@ local function setLogging(enabled, reason)
     end
     LoggingCombat(enabled)
     combatLog.active = enabled
+    if enabled then
+        combatLog.lastEnabledAt = now()
+    end
     announce(enabled, reason)
 end
 
@@ -169,9 +180,24 @@ function combatLog.evaluate(eventName)
     end
     local logThis, reason = shouldLog(eventName, info)
 
+    if logThis and info and info.difficultyID == 8 then
+        -- refresh the countdown hold whenever we're in a Mythic+ map, even if someone else started the key
+        markChallengeStart(info)
+    end
+
     if not logThis and isInChallengeHold(info) then
         logThis = true
         reason = reason or "Mythic+ start"
+    end
+
+    if not logThis and combatLog.active then
+        local elapsed = combatLog.lastEnabledAt and (now() - combatLog.lastEnabledAt) or nil
+        if elapsed and elapsed < enableHoldSeconds then
+            return
+        end
+        if not info.instanceType or info.instanceType == "" then
+            return
+        end
     end
 
     if logThis then

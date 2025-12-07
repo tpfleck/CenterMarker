@@ -18,7 +18,7 @@ addon.defaults = {
 }
 
 addon.limits = {
-    size = { min = 8, max = 256, step = 1 },
+    size = { min = 1, max = 256, step = 1 },
     alpha = { min = 0, max = 1, step = 0.05 },
 }
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.3
+- Lowered minimum marker size to 1px so you can scale anywhere between 1 and 256.
+- Dot marker now renders with a circular mask so it stays perfectly round when scaled up (no more oval at large sizes). Thanks for reporting the bug!
+- Fixed marker style dropdown so it correctly shows your last selected marker after a UI reload instead of "Custom."
+
 ## 0.6.2
 - Added `/cm cdm` slash command to open the Cooldown Manager settings window.
 - Added `/cm kb` slash command to open the quick keybind menu (falls back to the classic binding frame if needed).

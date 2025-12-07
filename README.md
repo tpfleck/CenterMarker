@@ -1,7 +1,7 @@
 # CenterMarker by Hubbs
 
 ### Feature Overview
-- **Always-visible anchor**: Places a crisp "+" at screen center; adjust size (8-256 px) and opacity (0-1).
+- **Always-visible anchor**: Places a crisp "+" at screen center; adjust size (1-256 px) and opacity (0-1).
 - **Color control**: Pick any color via swatch; changes apply instantly and persist.
 - **Visibility modes**: Show always, only in combat, only out of combat, only in instances, or only outside instances.
 - **Marker style choice**: Select +, x, dot (•), or asterisk (*).
