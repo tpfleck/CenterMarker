@@ -340,7 +340,104 @@ local function createConfigFrame()
     autoLogText:SetPoint("TOPLEFT", autoLogToggle, "BOTTOMLEFT", 4, -6)
     autoLogText:SetText("Turns /combatlog on in raids and Mythic+ automatically.")
 
-    unrelatedControls = { unrelatedHeader, autoLogToggle, autoLogText }
+    local healerManaToggle = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    healerManaToggle:SetPoint("TOPLEFT", autoLogText, "BOTTOMLEFT", -4, -16)
+    healerManaToggle.Text:SetText("Show Healer Mana (5-man)")
+
+    local healerManaText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    healerManaText:SetPoint("TOPLEFT", healerManaToggle, "BOTTOMLEFT", 4, -6)
+    healerManaText:SetJustifyH("LEFT")
+    healerManaText:SetWordWrap(true)
+    healerManaText:SetWidth(360)
+    healerManaText:SetText("Shows your healer's mana % in 5-player groups; drag the on-screen % to move it.")
+
+    local healerManaColorLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    healerManaColorLabel:SetPoint("TOPLEFT", healerManaText, "BOTTOMLEFT", -4, -16)
+    healerManaColorLabel:SetText("Healer Mana Color:")
+
+    local healerManaSwatch = CreateFrame("Button", nil, frame, "BackdropTemplate")
+    healerManaSwatch:SetSize(26, 26)
+    healerManaSwatch:SetPoint("LEFT", healerManaColorLabel, "RIGHT", 10, 0)
+    healerManaSwatch:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    })
+    healerManaSwatch:SetBackdropColor(0.05, 0.05, 0.08, 0.8)
+    healerManaSwatch:SetBackdropBorderColor(0.3, 0.6, 1, 0.8)
+
+    local healerManaSwatchTex = healerManaSwatch:CreateTexture(nil, "ARTWORK")
+    healerManaSwatchTex:SetPoint("TOPLEFT", healerManaSwatch, "TOPLEFT", 3, -3)
+    healerManaSwatchTex:SetPoint("BOTTOMRIGHT", healerManaSwatch, "BOTTOMRIGHT", -3, 3)
+
+    local healerManaSizeLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    healerManaSizeLabel:SetPoint("TOPLEFT", healerManaColorLabel, "BOTTOMLEFT", 0, -20)
+    healerManaSizeLabel:SetText("Healer Mana Font Size:")
+
+    local healerManaSizeSlider = CreateFrame("Slider", "CenterMarkerHealerManaSizeSlider", frame, "OptionsSliderTemplate")
+    healerManaSizeSlider:SetWidth(180)
+    healerManaSizeSlider:SetPoint("LEFT", healerManaSizeLabel, "LEFT", 180, 0)
+    healerManaSizeSlider:SetMinMaxValues(8, 48)
+    healerManaSizeSlider:SetValueStep(1)
+    healerManaSizeSlider:SetObeyStepOnDrag(true)
+    local sliderName = healerManaSizeSlider:GetName()
+    if not sliderName or sliderName == "" then
+        sliderName = "CenterMarkerHealerManaSizeSlider"
+    end
+    local low = _G[sliderName .. "Low"]
+    local high = _G[sliderName .. "High"]
+    local textLabel = _G[sliderName .. "Text"]
+    if low then
+        low:SetText("8")
+    end
+    if high then
+        high:SetText("48")
+    end
+    if textLabel then
+        textLabel:SetText("Font Size")
+    end
+
+    local healerManaFontLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    healerManaFontLabel:SetPoint("TOPLEFT", healerManaSizeLabel, "BOTTOMLEFT", 0, -20)
+    healerManaFontLabel:SetText("Healer Mana Font:")
+
+    local healerManaFontDropdown = CreateFrame("Frame", "CenterMarkerHealerManaFontDropdown", frame, "UIDropDownMenuTemplate")
+    healerManaFontDropdown:SetPoint("LEFT", healerManaFontLabel, "LEFT", 180, -2)
+    local fontOptions = {
+        { text = "Default", value = "DEFAULT" },
+        { text = "Friz Quadrata", value = "Fonts\\FRIZQT__.TTF" },
+        { text = "Arial Narrow", value = "Fonts\\ARIALN.TTF" },
+        { text = "Morpheus", value = "Fonts\\MORPHEUS.ttf" },
+        { text = "Skurri", value = "Fonts\\skurri.ttf" },
+    }
+
+    local function setHealerManaFont(value)
+        if value == "DEFAULT" then
+            CenterMarkerDB.healerManaFont = STANDARD_TEXT_FONT
+        else
+            CenterMarkerDB.healerManaFont = value
+        end
+        if addon.healerMana and addon.healerMana.refresh then
+            addon.healerMana.refresh()
+        end
+    end
+
+    initDropdown(healerManaFontDropdown, fontOptions, setHealerManaFont)
+
+    unrelatedControls = {
+        unrelatedHeader,
+        autoLogToggle,
+        autoLogText,
+        healerManaToggle,
+        healerManaText,
+        healerManaColorLabel,
+        healerManaSwatch,
+        healerManaSwatchTex,
+        healerManaSizeLabel,
+        healerManaSizeSlider,
+        healerManaFontLabel,
+        healerManaFontDropdown,
+    }
 
     slider:SetScript("OnValueChanged", function(_, value)
         CenterMarkerDB.size = addon.clamp(math.floor(value + 0.5), sizeLimits.min, sizeLimits.max)
@@ -445,6 +542,15 @@ local function createConfigFrame()
         if autoLogText:GetBottom() then
             bottom = math.min(bottom, autoLogText:GetBottom())
         end
+        if healerManaText:GetBottom() then
+            bottom = math.min(bottom, healerManaText:GetBottom())
+        end
+        if healerManaSizeLabel:GetBottom() then
+            bottom = math.min(bottom, healerManaSizeLabel:GetBottom())
+        end
+        if healerManaFontLabel:GetBottom() then
+            bottom = math.min(bottom, healerManaFontLabel:GetBottom())
+        end
         if top and bottom then
             local padding = 60
             local newHeight = (top - bottom) + padding
@@ -468,6 +574,15 @@ local function createConfigFrame()
         end
         feetOffsetBox:SetText(tostring(CenterMarkerDB.placeOffset or defaults.placeOffset))
         autoLogToggle:SetChecked(CenterMarkerDB.autoCombatLogEnabled)
+        healerManaToggle:SetChecked(CenterMarkerDB.healerManaEnabled)
+        local hmColor = CenterMarkerDB.healerManaColor or defaults.healerManaColor
+        healerManaSwatchTex:SetColorTexture(hmColor.r, hmColor.g, hmColor.b, 1)
+        healerManaSizeSlider:SetValue(CenterMarkerDB.healerManaFontSize or defaults.healerManaFontSize)
+        local fontValue = CenterMarkerDB.healerManaFont
+        if fontValue == STANDARD_TEXT_FONT then
+            fontValue = "DEFAULT"
+        end
+        setDropdownSelection(healerManaFontDropdown, fontOptions, fontValue, "DEFAULT")
         resizeToContent()
         toggleTab("main")
     end)
@@ -476,6 +591,70 @@ local function createConfigFrame()
         CenterMarkerDB.autoCombatLogEnabled = self:GetChecked()
         if addon.combatLog then
             addon.combatLog.evaluate("CONFIG_TOGGLE")
+        end
+    end)
+
+    healerManaToggle:SetScript("OnClick", function(self)
+        CenterMarkerDB.healerManaEnabled = self:GetChecked()
+        if addon.healerMana and addon.healerMana.refresh then
+            addon.healerMana.refresh()
+        end
+    end)
+
+    local function applyHealerManaColor(r, g, b)
+        CenterMarkerDB.healerManaColor.r = r
+        CenterMarkerDB.healerManaColor.g = g
+        CenterMarkerDB.healerManaColor.b = b
+        healerManaSwatchTex:SetColorTexture(r, g, b, 1)
+        if addon.healerMana and addon.healerMana.refresh then
+            addon.healerMana.refresh()
+        end
+    end
+
+    local function openHealerManaColorPicker()
+        local prev = {
+            CenterMarkerDB.healerManaColor.r,
+            CenterMarkerDB.healerManaColor.g,
+            CenterMarkerDB.healerManaColor.b,
+        }
+
+        local function applyFromPicker()
+            local r, g, b = ColorPickerFrame:GetColorRGB()
+            applyHealerManaColor(r, g, b)
+        end
+
+        local function restoreColor()
+            applyHealerManaColor(prev[1], prev[2], prev[3])
+        end
+
+        if ColorPickerFrame and ColorPickerFrame.SetupColorPickerAndShow then
+            local info = {
+                r = prev[1],
+                g = prev[2],
+                b = prev[3],
+                swatchFunc = applyFromPicker,
+                cancelFunc = restoreColor,
+                hasOpacity = false,
+            }
+            ColorPickerFrame:SetupColorPickerAndShow(info)
+        else
+            ColorPickerFrame:Hide()
+            ColorPickerFrame.hasOpacity = false
+            ColorPickerFrame.opacityFunc = nil
+            ColorPickerFrame.previousValues = prev
+            ColorPickerFrame.func = applyFromPicker
+            ColorPickerFrame.cancelFunc = restoreColor
+            ColorPickerFrame:SetColorRGB(prev[1], prev[2], prev[3])
+            ColorPickerFrame:Show()
+        end
+    end
+
+    healerManaSwatch:SetScript("OnClick", openHealerManaColorPicker)
+
+    healerManaSizeSlider:SetScript("OnValueChanged", function(_, value)
+        CenterMarkerDB.healerManaFontSize = math.floor(value + 0.5)
+        if addon.healerMana and addon.healerMana.refresh then
+            addon.healerMana.refresh()
         end
     end)
 

@@ -15,6 +15,11 @@ addon.defaults = {
     color = { r = 1, g = 0.82, b = 0 },
     autoCombatLogEnabled = true,
     autoCombatLogAnnounce = true,
+    healerManaEnabled = true,
+    healerManaPosition = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 220 },
+    healerManaColor = { r = 0.55, g = 0.78, b = 1 },
+    healerManaFontSize = 24,
+    healerManaFont = STANDARD_TEXT_FONT,
 }
 
 addon.limits = {
@@ -81,6 +86,40 @@ function addon.ensureCombatLogSettings(db)
     end
 end
 
+function addon.ensureHealerManaSettings(db)
+    if type(db.healerManaEnabled) ~= "boolean" then
+        db.healerManaEnabled = addon.defaults.healerManaEnabled
+    end
+
+    if type(db.healerManaPosition) ~= "table" then
+        db.healerManaPosition = {}
+    end
+
+    local pos = db.healerManaPosition
+    local defaults = addon.defaults.healerManaPosition
+    pos.point = pos.point or defaults.point
+    pos.relativePoint = pos.relativePoint or defaults.relativePoint
+    pos.x = tonumber(pos.x) or defaults.x
+    pos.y = tonumber(pos.y) or defaults.y
+
+    if type(db.healerManaColor) ~= "table" then
+        db.healerManaColor = {}
+    end
+    local c = db.healerManaColor
+    local dc = addon.defaults.healerManaColor
+    c.r = tonumber(c.r) or dc.r
+    c.g = tonumber(c.g) or dc.g
+    c.b = tonumber(c.b) or dc.b
+
+    if type(db.healerManaFontSize) ~= "number" then
+        db.healerManaFontSize = addon.defaults.healerManaFontSize
+    end
+
+    if type(db.healerManaFont) ~= "string" or db.healerManaFont == "" then
+        db.healerManaFont = addon.defaults.healerManaFont
+    end
+end
+
 function addon.clamp(value, minValue, maxValue)
     if value < minValue then
         return minValue
@@ -97,6 +136,7 @@ function addon.normalizeDB(db)
     addon.ensureCondition(db)
     addon.ensureShape(db)
     addon.ensureCombatLogSettings(db)
+    addon.ensureHealerManaSettings(db)
     return db
 end
 

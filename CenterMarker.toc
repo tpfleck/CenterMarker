@@ -2,12 +2,13 @@
 ## Title: Center Marker
 ## Notes: Shows a simple plus marker at the center of your screen.
 ## Author: Hubbs
-## Version: 0.6.4
+## Version: 0.7.2
 ## SavedVariables: CenterMarkerDB
 
 CenterMarker_Init.lua
 CenterMarker_Marker.lua
 CenterMarker_CombatLog.lua
+CenterMarker_HealerMana.lua
 CenterMarker_Config.lua
 CenterMarker_Commands.lua
 CenterMarker_Events.lua

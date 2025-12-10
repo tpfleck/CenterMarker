@@ -1,7 +1,16 @@
 # Changelog
 
+## 0.7.1
+- Healer mana display now lets you choose font color and size in Cool Stuff; display is text-only and fully draggable.
+
+## 0.7.2
+- Added font picker and styling for the healer mana percent text in Cool Stuff; helper copy now wraps inside the panel.
+
+## 0.7.0
+- Added a movable healer mana display under **Cool Stuff**. When enabled, it shows your party healer's mana percent in 5-player groups using `UnitPowerPercent`; drag the on-screen number to reposition it.
+
 ## 0.6.4
-- Trying this again to fix the auto combat logging spam when someone else starts the key—hopefully the fourth try sticks (listening to the keystone countdown `START_TIMER` type 4).
+- Trying this again to fix the auto combat logging spam when someone else starts the key-hopefully the fourth try sticks (listening to the keystone countdown `START_TIMER` type 4).
 
 ## 0.6.3
 - Lowered minimum marker size to 1px so you can scale anywhere between 1 and 256.
