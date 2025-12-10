@@ -3,8 +3,8 @@
 ## 0.7.1
 - Healer mana display now lets you choose font color and size in Cool Stuff; display is text-only and fully draggable.
 
-## 0.7.2
-- Added font picker and styling for the healer mana percent text in Cool Stuff; helper copy now wraps inside the panel.
+## 0.7.1 hotfix2
+- Fixed the healer mana font size slider causing the Cool Stuff tab to error when loading (guards missing slider labels).
 
 ## 0.7.0
 - Added a movable healer mana display under **Cool Stuff**. When enabled, it shows your party healer's mana percent in 5-player groups using `UnitPowerPercent`; drag the on-screen number to reposition it.

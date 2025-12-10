@@ -397,33 +397,6 @@ local function createConfigFrame()
         textLabel:SetText("Font Size")
     end
 
-    local healerManaFontLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    healerManaFontLabel:SetPoint("TOPLEFT", healerManaSizeLabel, "BOTTOMLEFT", 0, -20)
-    healerManaFontLabel:SetText("Healer Mana Font:")
-
-    local healerManaFontDropdown = CreateFrame("Frame", "CenterMarkerHealerManaFontDropdown", frame, "UIDropDownMenuTemplate")
-    healerManaFontDropdown:SetPoint("LEFT", healerManaFontLabel, "LEFT", 180, -2)
-    local fontOptions = {
-        { text = "Default", value = "DEFAULT" },
-        { text = "Friz Quadrata", value = "Fonts\\FRIZQT__.TTF" },
-        { text = "Arial Narrow", value = "Fonts\\ARIALN.TTF" },
-        { text = "Morpheus", value = "Fonts\\MORPHEUS.ttf" },
-        { text = "Skurri", value = "Fonts\\skurri.ttf" },
-    }
-
-    local function setHealerManaFont(value)
-        if value == "DEFAULT" then
-            CenterMarkerDB.healerManaFont = STANDARD_TEXT_FONT
-        else
-            CenterMarkerDB.healerManaFont = value
-        end
-        if addon.healerMana and addon.healerMana.refresh then
-            addon.healerMana.refresh()
-        end
-    end
-
-    initDropdown(healerManaFontDropdown, fontOptions, setHealerManaFont)
-
     unrelatedControls = {
         unrelatedHeader,
         autoLogToggle,
@@ -435,8 +408,6 @@ local function createConfigFrame()
         healerManaSwatchTex,
         healerManaSizeLabel,
         healerManaSizeSlider,
-        healerManaFontLabel,
-        healerManaFontDropdown,
     }
 
     slider:SetScript("OnValueChanged", function(_, value)
@@ -548,9 +519,6 @@ local function createConfigFrame()
         if healerManaSizeLabel:GetBottom() then
             bottom = math.min(bottom, healerManaSizeLabel:GetBottom())
         end
-        if healerManaFontLabel:GetBottom() then
-            bottom = math.min(bottom, healerManaFontLabel:GetBottom())
-        end
         if top and bottom then
             local padding = 60
             local newHeight = (top - bottom) + padding
@@ -578,11 +546,6 @@ local function createConfigFrame()
         local hmColor = CenterMarkerDB.healerManaColor or defaults.healerManaColor
         healerManaSwatchTex:SetColorTexture(hmColor.r, hmColor.g, hmColor.b, 1)
         healerManaSizeSlider:SetValue(CenterMarkerDB.healerManaFontSize or defaults.healerManaFontSize)
-        local fontValue = CenterMarkerDB.healerManaFont
-        if fontValue == STANDARD_TEXT_FONT then
-            fontValue = "DEFAULT"
-        end
-        setDropdownSelection(healerManaFontDropdown, fontOptions, fontValue, "DEFAULT")
         resizeToContent()
         toggleTab("main")
     end)

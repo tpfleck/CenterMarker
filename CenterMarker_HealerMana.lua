@@ -108,8 +108,7 @@ local function applyStyle()
     local color = db.healerManaColor or addon.defaults.healerManaColor
     value:SetTextColor(color.r or 1, color.g or 1, color.b or 1)
     local size = db.healerManaFontSize or addon.defaults.healerManaFontSize
-    local font = db.healerManaFont or addon.defaults.healerManaFont or STANDARD_TEXT_FONT
-    value:SetFont(font, size, "OUTLINE")
+    value:SetFont(STANDARD_TEXT_FONT, size, "OUTLINE")
 end
 
 local function updateMana()

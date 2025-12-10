@@ -19,7 +19,6 @@ addon.defaults = {
     healerManaPosition = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 220 },
     healerManaColor = { r = 0.55, g = 0.78, b = 1 },
     healerManaFontSize = 24,
-    healerManaFont = STANDARD_TEXT_FONT,
 }
 
 addon.limits = {
@@ -113,10 +112,6 @@ function addon.ensureHealerManaSettings(db)
 
     if type(db.healerManaFontSize) ~= "number" then
         db.healerManaFontSize = addon.defaults.healerManaFontSize
-    end
-
-    if type(db.healerManaFont) ~= "string" or db.healerManaFont == "" then
-        db.healerManaFont = addon.defaults.healerManaFont
     end
 end
 
