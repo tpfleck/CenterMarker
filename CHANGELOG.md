@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.1
+- Healer mana display now shows whole percentages (rounded) so the value no longer includes long decimals.
+
 ## 0.7.0
 - Added a movable healer mana display under **Cool Stuff** that shows your party healer's mana percent in 5-player groups using `UnitPowerPercent`; the on-screen percent is text-only and draggable.
 

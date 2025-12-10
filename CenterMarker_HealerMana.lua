@@ -144,18 +144,28 @@ local function updateMana()
     local percent = getManaPercent(trackedUnit)
 
     if percent ~= nil then
-        local okString, text = pcall(tostring, percent)
-        if okString and text then
-            local suffix = ""
-            local okFind, hasPercent = pcall(function()
-                return text:find("%%")
-            end)
-            if not (okFind and hasPercent) then
-                suffix = "%"
+        local numberPercent = tonumber(percent)
+        if numberPercent then
+            local okFormat, formatted = pcall(string.format, "%.0f%%", numberPercent)
+            if okFormat and formatted then
+                value:SetText(formatted)
+                display:Show()
+                return
             end
-            value:SetText(text .. suffix)
-            display:Show()
-            return
+        else
+            local okString, text = pcall(tostring, percent)
+            if okString and text then
+                local suffix = ""
+                local okFind, hasPercent = pcall(function()
+                    return text:find("%%")
+                end)
+                if not (okFind and hasPercent) then
+                    suffix = "%"
+                end
+                value:SetText(text .. suffix)
+                display:Show()
+                return
+            end
         end
     end
 
