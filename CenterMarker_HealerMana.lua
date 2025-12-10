@@ -15,6 +15,11 @@ local function getPosition()
     return db.healerManaPosition or addon.defaults.healerManaPosition
 end
 
+local function isLocked()
+    local db = ensureDB()
+    return db.healerManaLocked and true or false
+end
+
 local display = CreateFrame("Frame", "CenterMarkerHealerManaFrame", UIParent)
 display:SetFrameStrata("MEDIUM")
 display:SetSize(80, 32)
@@ -22,9 +27,17 @@ display:Hide()
 display:SetMovable(true)
 display:EnableMouse(true)
 display:RegisterForDrag("LeftButton")
-display:SetScript("OnDragStart", display.StartMoving)
+display:SetScript("OnDragStart", function(self)
+    if isLocked() then
+        return
+    end
+    self:StartMoving()
+end)
 
 local function savePosition()
+    if isLocked() then
+        return
+    end
     local db = ensureDB()
     local pos = db.healerManaPosition
     local point, _, relativePoint, x, y = display:GetPoint()
@@ -50,6 +63,18 @@ local function applyPosition()
     local pos = getPosition()
     display:ClearAllPoints()
     display:SetPoint(pos.point or "CENTER", UIParent, pos.relativePoint or "CENTER", pos.x or 0, pos.y or 0)
+end
+
+local function applyLockState()
+    local locked = isLocked()
+    display:StopMovingOrSizing()
+    display:SetMovable(not locked)
+    display:EnableMouse(not locked)
+    if locked then
+        display:RegisterForDrag()
+    else
+        display:RegisterForDrag("LeftButton")
+    end
 end
 
 local function isEnabled()
@@ -153,6 +178,7 @@ local function refreshTrackedUnit()
         return
     end
 
+    applyLockState()
     applyPosition()
     applyStyle()
     updateMana()
@@ -190,6 +216,10 @@ end
 
 function healerMana.savePosition()
     savePosition()
+end
+
+function healerMana.applyLockState()
+    applyLockState()
 end
 
 refreshTrackedUnit()

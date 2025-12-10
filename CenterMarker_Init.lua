@@ -19,6 +19,7 @@ addon.defaults = {
     healerManaPosition = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 220 },
     healerManaColor = { r = 0.55, g = 0.78, b = 1 },
     healerManaFontSize = 24,
+    healerManaLocked = false,
 }
 
 addon.limits = {
@@ -112,6 +113,10 @@ function addon.ensureHealerManaSettings(db)
 
     if type(db.healerManaFontSize) ~= "number" then
         db.healerManaFontSize = addon.defaults.healerManaFontSize
+    end
+
+    if type(db.healerManaLocked) ~= "boolean" then
+        db.healerManaLocked = addon.defaults.healerManaLocked
     end
 end
 

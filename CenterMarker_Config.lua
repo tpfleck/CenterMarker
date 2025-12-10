@@ -344,12 +344,16 @@ local function createConfigFrame()
     healerManaToggle:SetPoint("TOPLEFT", autoLogText, "BOTTOMLEFT", -4, -16)
     healerManaToggle.Text:SetText("Show Healer Mana (5-man)")
 
+    local healerManaLockToggle = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+    healerManaLockToggle:SetPoint("LEFT", healerManaToggle.Text, "RIGHT", 80, 0)
+    healerManaLockToggle.Text:SetText("Lock Healer Mana Position")
+
     local healerManaText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     healerManaText:SetPoint("TOPLEFT", healerManaToggle, "BOTTOMLEFT", 4, -6)
     healerManaText:SetJustifyH("LEFT")
     healerManaText:SetWordWrap(true)
     healerManaText:SetWidth(360)
-    healerManaText:SetText("Shows your healer's mana % in 5-player groups; drag the on-screen % to move it.")
+    healerManaText:SetText("Shows your healer's mana % in 5-player groups; drag the on-screen % to move it (when unlocked).")
 
     local healerManaColorLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     healerManaColorLabel:SetPoint("TOPLEFT", healerManaText, "BOTTOMLEFT", -4, -16)
@@ -403,6 +407,7 @@ local function createConfigFrame()
         autoLogText,
         healerManaToggle,
         healerManaText,
+        healerManaLockToggle,
         healerManaColorLabel,
         healerManaSwatch,
         healerManaSwatchTex,
@@ -543,6 +548,7 @@ local function createConfigFrame()
         feetOffsetBox:SetText(tostring(CenterMarkerDB.placeOffset or defaults.placeOffset))
         autoLogToggle:SetChecked(CenterMarkerDB.autoCombatLogEnabled)
         healerManaToggle:SetChecked(CenterMarkerDB.healerManaEnabled)
+        healerManaLockToggle:SetChecked(CenterMarkerDB.healerManaLocked)
         local hmColor = CenterMarkerDB.healerManaColor or defaults.healerManaColor
         healerManaSwatchTex:SetColorTexture(hmColor.r, hmColor.g, hmColor.b, 1)
         healerManaSizeSlider:SetValue(CenterMarkerDB.healerManaFontSize or defaults.healerManaFontSize)
@@ -561,6 +567,15 @@ local function createConfigFrame()
         CenterMarkerDB.healerManaEnabled = self:GetChecked()
         if addon.healerMana and addon.healerMana.refresh then
             addon.healerMana.refresh()
+        end
+    end)
+
+    healerManaLockToggle:SetScript("OnClick", function(self)
+        CenterMarkerDB.healerManaLocked = self:GetChecked()
+        if addon.healerMana and addon.healerMana.refresh then
+            addon.healerMana.refresh()
+        elseif addon.healerMana and addon.healerMana.applyLockState then
+            addon.healerMana.applyLockState()
         end
     end)
 
