@@ -163,7 +163,7 @@ local function setLogging(enabled, reason)
     announce(enabled, reason)
 end
 
-function combatLog.evaluate(eventName)
+function combatLog.evaluate(eventName, eventArg1)
     local db = ensureDB()
     combatLog.active = LoggingCombat() and true or false
 
@@ -175,10 +175,19 @@ function combatLog.evaluate(eventName)
     end
 
     local info = readInstanceInfo()
-    if eventName == "CHALLENGE_MODE_START" then
+    local timerType = eventArg1
+    local isStartTimer = eventName == "START_TIMER"
+    local isChallengeTimerStart = isStartTimer and (
+        timerType == 4 or
+        (info.instanceType == "party" and (info.difficultyID == 8 or isChallengeModeActive()))
+    )
+    local rulesEvent = isChallengeTimerStart and "CHALLENGE_MODE_START" or eventName
+
+    if rulesEvent == "CHALLENGE_MODE_START" then
+        -- START_TIMER (type 4) fires when the keystone countdown begins; treat it the same as challenge start
         markChallengeStart(info)
     end
-    local logThis, reason = shouldLog(eventName, info)
+    local logThis, reason = shouldLog(rulesEvent, info)
 
     if logThis and info and info.difficultyID == 8 then
         -- refresh the countdown hold whenever we're in a Mythic+ map, even if someone else started the key

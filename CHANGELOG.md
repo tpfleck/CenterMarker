@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+- Added a movable healer mana display under **Cool Stuff** that shows your party healer's mana percent in 5-player groups using `UnitPowerPercent`; the on-screen percent is text-only and draggable.
+
+## 0.6.4
+- Trying this again to fix the auto combat logging spam when someone else starts the key-hopefully the fourth try sticks (listening to the keystone countdown `START_TIMER` type 4).
+
 ## 0.6.3
 - Lowered minimum marker size to 1px so you can scale anywhere between 1 and 256.
 - Dot marker now renders with a circular mask so it stays perfectly round when scaled up (no more oval at large sizes). Thanks for reporting the bug!

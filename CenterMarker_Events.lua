@@ -2,9 +2,9 @@ local addon = CenterMarker
 
 local events = CreateFrame("Frame")
 
-local function reevaluateCombatLog(event)
+local function reevaluateCombatLog(event, ...)
     if addon.combatLog then
-        addon.combatLog.evaluate(event)
+        addon.combatLog.evaluate(event, ...)
     end
 end
 
@@ -23,21 +23,25 @@ local eventHandlers = {
             addon.combatLog.bootstrap()
         end
     end,
-    PLAYER_ENTERING_WORLD = function(event)
+    PLAYER_ENTERING_WORLD = function(event, ...)
         refreshSettings()
-        reevaluateCombatLog(event)
+        reevaluateCombatLog(event, ...)
     end,
-    ZONE_CHANGED_NEW_AREA = function(event)
+    ZONE_CHANGED_NEW_AREA = function(event, ...)
         refreshSettings()
-        reevaluateCombatLog(event)
+        reevaluateCombatLog(event, ...)
     end,
-    PLAYER_DIFFICULTY_CHANGED = function(event)
+    PLAYER_DIFFICULTY_CHANGED = function(event, ...)
         refreshSettings()
-        reevaluateCombatLog(event)
+        reevaluateCombatLog(event, ...)
     end,
-    CHALLENGE_MODE_START = function(event)
+    CHALLENGE_MODE_START = function(event, ...)
         refreshSettings()
-        reevaluateCombatLog(event)
+        reevaluateCombatLog(event, ...)
+    end,
+    START_TIMER = function(event, ...)
+        refreshSettings()
+        reevaluateCombatLog(event, ...)
     end,
     NAME_PLATE_UNIT_ADDED = function(_, unit)
         if unit == "player" then
@@ -60,9 +64,9 @@ for event in pairs(eventHandlers) do
     events:RegisterEvent(event)
 end
 
-events:SetScript("OnEvent", function(_, event, arg1)
+events:SetScript("OnEvent", function(_, event, ...)
     local handler = eventHandlers[event]
     if handler then
-        handler(event, arg1)
+        handler(event, ...)
     end
 end)
