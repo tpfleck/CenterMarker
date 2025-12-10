@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.4
+- Trying this again to fix the auto combat logging spam when someone else starts the key—hopefully the fourth try sticks (listening to the keystone countdown `START_TIMER` type 4).
+
 ## 0.6.3
 - Lowered minimum marker size to 1px so you can scale anywhere between 1 and 256.
 - Dot marker now renders with a circular mask so it stays perfectly round when scaled up (no more oval at large sizes). Thanks for reporting the bug!
