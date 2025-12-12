@@ -4,6 +4,14 @@ local healerMana = {}
 addon.healerMana = healerMana
 
 local manaPowerType = (Enum and Enum.PowerType and Enum.PowerType.Mana) or 0
+local scaleTo100Curve = rawget(_G, "CurveConstants") and CurveConstants.ScaleTo100
+
+local function ToPlainNumber(value)
+    if type(value) == "number" then
+        return value
+    end
+    return nil
+end
 
 local function ensureDB()
     CenterMarkerDB = addon.normalizeDB(CenterMarkerDB)
@@ -116,15 +124,26 @@ local function getManaPercent(unit)
     end
 
     if UnitPowerPercent then
-        local ok, percent = pcall(UnitPowerPercent, unit, manaPowerType, true, true)
-        if ok and percent ~= nil then
-            return percent
-        end
-        ok, percent = pcall(UnitPowerPercent, unit, manaPowerType)
-        if ok and percent ~= nil then
-            return percent
+        local attempts = {
+            {unit, manaPowerType, true, scaleTo100Curve},
+            {unit, manaPowerType, true, nil},
+            {unit, manaPowerType, nil, scaleTo100Curve},
+            {unit, manaPowerType, nil, nil},
+        }
+        for _, args in ipairs(attempts) do
+            local ok, percent = pcall(UnitPowerPercent, unpack(args))
+            if ok and type(percent) == "number" then
+                return percent
+            end
         end
     end
+
+    local current = ToPlainNumber(UnitPower(unit, true)) or ToPlainNumber(UnitPower(unit))
+    local max = ToPlainNumber(UnitPowerMax(unit, true)) or ToPlainNumber(UnitPowerMax(unit))
+    if current and max and max > 0 then
+        return (current / max) * 100
+    end
+
     return nil
 end
 

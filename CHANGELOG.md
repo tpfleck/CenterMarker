@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.2
+- Big fix from recent beta build. Healer mana display now pulls a proper 0-100% value by using the curve-aware UnitPowerPercent signature and falling back to a sanitized UnitPower/UnitPowerMax, eliminating the stuck 1%/negative readings.
+
 ## 0.7.1
 - Healer mana display now shows whole percentages (rounded) so the value no longer includes long decimals.
 
